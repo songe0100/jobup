@@ -4,3 +4,6 @@
 .brand-copy { color: #F47F6B; font-size: 13px; font-weight: 800; letter-spacing: -0.9px; line-height: 1.25; white-space: nowrap; }
 .area-card.coming-soon { cursor: default; }
 .area-card.coming-soon:hover { transform: none; box-shadow: none; }
+.similar-preview { margin-top: 16px; background: #fffaf7; border: 1px solid #f1e4dc; border-radius: 9px; padding: 12px; font-size: 11px; color: #6f6a63; }
+.similar-preview p { margin: 0 0 10px; line-height: 1.6; }
+.similar-preview span { display: block; margin-top: 5px; color: #4a4640; }
