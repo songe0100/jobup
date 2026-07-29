@@ -2,3 +2,5 @@
 .brand { width: 100%; gap: 10px; padding-left: 2px; padding-right: 2px; }
 .brand img { display: block; flex: 0 0 92px; width: 92px; height: 62px; object-fit: cover; object-position: center; border-radius: 4px; }
 .brand-copy { color: #174d91; font-size: 13px; font-weight: 800; letter-spacing: -0.9px; line-height: 1.25; white-space: nowrap; }
+.area-card.coming-soon { cursor: default; }
+.area-card.coming-soon:hover { transform: none; box-shadow: none; }
