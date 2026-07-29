@@ -69,7 +69,9 @@ export default function Home() {
   const [dailyGoal, setDailyGoal] = useState(3);
   const area = areas.find((item) => item.id === areaId) ?? areas[0];
   const areaQuestions = allQuestions.filter((q) => q.area === areaId);
-  const questionNumber = Math.max(1, areaQuestions.findIndex((q) => q.id === question.id) + 1);
+  const todayKey = new Date().toLocaleDateString("sv-SE");
+  const todaySolved = historyRecords.filter((record) => record.dateKey === todayKey).length;
+  const questionNumber = Math.min(areaQuestions.length, Math.max(1, sessionSolved + (submitted ? 0 : 1)));
   const correct = answer === question.answer;
 
   useEffect(() => { const raw = localStorage.getItem("job-cert-settings"); if (raw) { const s = JSON.parse(raw); setModel(s.model || model); setKey(s.key || ""); setDisplayName(s.displayName || "서준"); setDailyGoal(Number(s.dailyGoal) || 3); } }, []);
@@ -101,7 +103,7 @@ export default function Home() {
       <header className="topbar"><div className="breadcrumb">직UP <span>/</span> {view === "home" ? "대시보드" : view === "practice" ? "문제 풀이" : view === "wrong" ? "오답노트" : "학습 기록"}</div><div className="top-actions"><span className="demo-badge">● 데모 모드</span><button className="icon-btn" onClick={() => setSettingsOpen(true)}>⚙</button></div></header>
       {view === "home" && <HomeView recentActivity={recentActivity} historyRecords={historyRecords} onChoose={() => setView("areas")} onAreaChoose={chooseArea} onHistory={() => setView("history")} />}
       {view === "areas" && <AreaView onChoose={chooseArea} />}
-      {view === "practice" && <PracticeView area={area} question={question} questionNumber={questionNumber} questionTotal={areaQuestions.length} sessionSolved={sessionSolved} elapsedSeconds={elapsedSeconds} answer={answer} setAnswer={setAnswer} submitted={submitted} correct={correct} progress={progress} saved={saved} onSubmit={submit} onNext={next} onSave={saveCurrentQuestion} onBack={() => setView("areas")} onStudy={openSupplement} />}
+      {view === "practice" && <PracticeView area={area} question={question} questionNumber={questionNumber} questionTotal={areaQuestions.length} sessionSolved={3 - dailyGoal + todaySolved} elapsedSeconds={elapsedSeconds} answer={answer} setAnswer={setAnswer} submitted={submitted} correct={correct} progress={progress} saved={saved} onSubmit={submit} onNext={next} onSave={saveCurrentQuestion} onBack={() => setView("areas")} onStudy={openSupplement} />}
       {view === "supplement" && <SupplementView question={question} similarQuestion={similarQuestion} area={area} onStartSimilar={startSimilar} />}
       {view === "history" && <HistoryViewDynamic records={historyRecords} onRetry={chooseArea} />}
       {view === "wrong" && <WrongViewDynamic savedQuestions={allQuestions.filter((q) => savedQuestionIds.includes(q.id))} onRetry={retryQuestion} />}
