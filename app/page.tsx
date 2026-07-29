@@ -86,7 +86,7 @@ export default function Home() {
   function next() { const areaQuestions = allQuestions.filter((q) => q.area === areaId); const candidates = areaQuestions.filter((q) => q.id !== question.id); const nextQ = candidates[Math.floor(Math.random() * candidates.length)] ?? areaQuestions[0] ?? fallbackQuestion; setQuestion(nextQ); setAreaId(nextQ.area); setAnswer(""); setSubmitted(false); setSaved(false); setStartedAt(Date.now()); setElapsedSeconds(0); }
   function openSupplement() { setSimilarQuestion(createSimilarQuestion(question)); setView("supplement"); }
   function startSimilar() { if (!similarQuestion) return; setQuestion(similarQuestion); setAreaId(similarQuestion.area); setAnswer(""); setSubmitted(false); setSaved(false); setStartedAt(Date.now()); setElapsedSeconds(0); setView("practice"); }
-  function saveCurrentQuestion() { if (correct) return; const next = savedQuestionIds.includes(question.id) ? savedQuestionIds : [question.id, ...savedQuestionIds]; setSavedQuestionIds(next); setSaved(true); localStorage.setItem("job-cert-wrong-answers", JSON.stringify(next)); }
+  function saveCurrentQuestion() { if (correct) return; setSavedQuestionIds((previous) => { const next = previous.includes(question.id) ? previous : [question.id, ...previous]; localStorage.setItem("job-cert-wrong-answers", JSON.stringify(next)); return next; }); setSaved(true); }
   function saveSettings() { localStorage.setItem("job-cert-settings", JSON.stringify({ model, key, displayName, dailyGoal })); setSettingsOpen(false); }
 
   return <main className="app-shell">
