@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { pdfQuestions } from "./problemQuestions";
+import WrongViewDynamic from "./WrongView";
 
 type Area = { id: string; label: string; short: string; color: string; icon: string; desc: string; stat: string };
 type Question = { id: string; area: string; type: string; level: string; title: string; body: string; choices?: string[]; answer: string; explanation: string; process: string[]; concept: string };
@@ -58,6 +59,7 @@ export default function Home() {
   const [sessionSolved, setSessionSolved] = useState(0);
   const [recentActivity, setRecentActivity] = useState<RecentActivity | null>(null);
   const [historyRecords, setHistoryRecords] = useState<HistoryRecord[]>([]);
+  const [savedQuestionIds, setSavedQuestionIds] = useState<string[]>([]);
   const [startedAt, setStartedAt] = useState(Date.now());
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -73,6 +75,7 @@ export default function Home() {
   useEffect(() => { const raw = localStorage.getItem("job-cert-settings"); if (raw) { const s = JSON.parse(raw); setModel(s.model || model); setKey(s.key || ""); setDisplayName(s.displayName || "서준"); setDailyGoal(Number(s.dailyGoal) || 3); } }, []);
   useEffect(() => { const raw = localStorage.getItem("job-cert-recent"); if (raw) setRecentActivity(JSON.parse(raw)); }, []);
   useEffect(() => { const raw = localStorage.getItem("job-cert-history"); if (raw) setHistoryRecords(JSON.parse(raw)); }, []);
+  useEffect(() => { const raw = localStorage.getItem("job-cert-wrong-answers"); if (raw) setSavedQuestionIds(JSON.parse(raw)); }, []);
   useEffect(() => { if (view !== "practice" || submitted) return; const timer = window.setInterval(() => setElapsedSeconds(Math.floor((Date.now() - startedAt) / 1000)), 1000); return () => window.clearInterval(timer); }, [view, submitted, startedAt]);
   useEffect(() => { localStorage.setItem("job-cert-attempts", String(attempts)); }, [attempts]);
   const progress = useMemo(() => submitted ? 50 : 25, [submitted]);
@@ -82,6 +85,7 @@ export default function Home() {
   function next() { const areaQuestions = allQuestions.filter((q) => q.area === areaId); const candidates = areaQuestions.filter((q) => q.id !== question.id); const nextQ = candidates[Math.floor(Math.random() * candidates.length)] ?? areaQuestions[0] ?? fallbackQuestion; setQuestion(nextQ); setAreaId(nextQ.area); setAnswer(""); setSubmitted(false); setSaved(false); setStartedAt(Date.now()); setElapsedSeconds(0); }
   function openSupplement() { setSimilarQuestion(createSimilarQuestion(question)); setView("supplement"); }
   function startSimilar() { if (!similarQuestion) return; setQuestion(similarQuestion); setAreaId(similarQuestion.area); setAnswer(""); setSubmitted(false); setSaved(false); setStartedAt(Date.now()); setElapsedSeconds(0); setView("practice"); }
+  function saveCurrentQuestion() { const next = savedQuestionIds.includes(question.id) ? savedQuestionIds : [question.id, ...savedQuestionIds]; setSavedQuestionIds(next); setSaved(true); localStorage.setItem("job-cert-wrong-answers", JSON.stringify(next)); }
   function saveSettings() { localStorage.setItem("job-cert-settings", JSON.stringify({ model, key, displayName, dailyGoal })); setSettingsOpen(false); }
 
   return <main className="app-shell">
@@ -95,10 +99,10 @@ export default function Home() {
       <header className="topbar"><div className="breadcrumb">직UP <span>/</span> {view === "home" ? "대시보드" : view === "practice" ? "문제 풀이" : view === "wrong" ? "오답노트" : "학습 기록"}</div><div className="top-actions"><span className="demo-badge">● 데모 모드</span><button className="icon-btn" onClick={() => setSettingsOpen(true)}>⚙</button></div></header>
       {view === "home" && <HomeView recentActivity={recentActivity} onChoose={() => setView("areas")} onAreaChoose={chooseArea} onHistory={() => setView("history")} />}
       {view === "areas" && <AreaView onChoose={chooseArea} />}
-      {view === "practice" && <PracticeView area={area} question={question} questionNumber={questionNumber} questionTotal={areaQuestions.length} sessionSolved={sessionSolved} elapsedSeconds={elapsedSeconds} answer={answer} setAnswer={setAnswer} submitted={submitted} correct={correct} progress={progress} saved={saved} onSubmit={submit} onNext={next} onSave={() => setSaved(true)} onBack={() => setView("areas")} onStudy={openSupplement} />}
+      {view === "practice" && <PracticeView area={area} question={question} questionNumber={questionNumber} questionTotal={areaQuestions.length} sessionSolved={sessionSolved} elapsedSeconds={elapsedSeconds} answer={answer} setAnswer={setAnswer} submitted={submitted} correct={correct} progress={progress} saved={saved} onSubmit={submit} onNext={next} onSave={saveCurrentQuestion} onBack={() => setView("areas")} onStudy={openSupplement} />}
       {view === "supplement" && <SupplementView question={question} similarQuestion={similarQuestion} area={area} onStartSimilar={startSimilar} />}
       {view === "history" && <HistoryViewDynamic records={historyRecords} onRetry={chooseArea} />}
-      {view === "wrong" && <WrongView onRetry={chooseArea} />}
+      {view === "wrong" && <WrongViewDynamic savedQuestions={allQuestions.filter((q) => savedQuestionIds.includes(q.id))} onRetry={chooseArea} />}
     </section>
     {settingsOpen && <div className="modal-backdrop" onClick={() => setSettingsOpen(false)}><div className="modal" onClick={(e) => e.stopPropagation()}><div className="modal-head"><div><p className="eyebrow">PERSONAL SETTINGS</p><h2>개인 설정</h2></div><button className="close" onClick={() => setSettingsOpen(false)}>×</button></div><label>표시 이름<span className="muted">사이드바에 표시할 이름입니다.</span><input type="text" placeholder="이름을 입력하세요" value={displayName} onChange={(e) => setDisplayName(e.target.value)} /></label><label>오늘의 목표 문항 수<input type="number" min="1" max="50" value={dailyGoal} onChange={(e) => setDailyGoal(Math.max(1, Number(e.target.value) || 1))} /></label><label>Gemini API 키<span className="muted">서버에서만 사용되도록 암호화해 관리합니다.</span><input type="password" placeholder="AIza..." value={key} onChange={(e) => setKey(e.target.value)} /></label><label>선호 모델<select value={model} onChange={(e) => setModel(e.target.value)}><option>Gemini 3.5 Flash-Lite</option><option>Gemini 3.5 Flash</option><option>Gemini 3.5 Pro</option></select></label><label>기본 학습 영역<select><option>의사소통 국어</option><option>수리활용 영역</option><option>문제해결 영역</option></select></label><button className="primary full" onClick={saveSettings}>설정 저장하기</button></div></div>}
   </main>;
