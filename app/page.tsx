@@ -70,9 +70,9 @@ export default function Home() {
   useEffect(() => { localStorage.setItem("job-cert-attempts", String(attempts)); }, [attempts]);
   const progress = useMemo(() => submitted ? 50 : 25, [submitted]);
 
-  function chooseArea(id: string) { setAreaId(id); const match = allQuestions.find((q) => q.area === id) ?? fallbackQuestion; setQuestion(match); setAnswer(""); setSubmitted(false); setSaved(false); setView("practice"); }
+  function chooseArea(id: string) { const areaQuestions = allQuestions.filter((q) => q.area === id); const match = areaQuestions[Math.floor(Math.random() * areaQuestions.length)] ?? fallbackQuestion; setAreaId(id); setQuestion(match); setAnswer(""); setSubmitted(false); setSaved(false); setView("practice"); }
   function submit() { if (!answer) return; setSubmitted(true); setAttempts((v) => v + 1); setSessionSolved((v) => v + 1); const nextRecent = { areaId, label: area.label, type: question.type, level: question.level, score: correct ? "정답" : "오답", count: attempts + 1, timestamp: "방금 전" }; setRecentActivity(nextRecent); localStorage.setItem("job-cert-recent", JSON.stringify(nextRecent)); }
-  function next() { const areaQuestions = allQuestions.filter((q) => q.area === areaId); const idx = areaQuestions.findIndex((q) => q.id === question.id); const nextQ = areaQuestions[(idx + 1) % areaQuestions.length] ?? fallbackQuestion; setQuestion(nextQ); setAreaId(nextQ.area); setAnswer(""); setSubmitted(false); setSaved(false); }
+  function next() { const areaQuestions = allQuestions.filter((q) => q.area === areaId); const candidates = areaQuestions.filter((q) => q.id !== question.id); const nextQ = candidates[Math.floor(Math.random() * candidates.length)] ?? areaQuestions[0] ?? fallbackQuestion; setQuestion(nextQ); setAreaId(nextQ.area); setAnswer(""); setSubmitted(false); setSaved(false); }
   function openSupplement() { setSimilarQuestion(createSimilarQuestion(question)); setView("supplement"); }
   function startSimilar() { if (!similarQuestion) return; setQuestion(similarQuestion); setAreaId(similarQuestion.area); setAnswer(""); setSubmitted(false); setSaved(false); setView("practice"); }
   function saveSettings() { localStorage.setItem("job-cert-settings", JSON.stringify({ model, key, displayName, dailyGoal })); setSettingsOpen(false); }
