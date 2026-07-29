@@ -79,7 +79,7 @@ export default function Home() {
 
   return <main className="app-shell">
     <aside className="sidebar">
-      <button className="brand" onClick={() => setView("home")} aria-label="직UP 홈으로 이동"><img src="/logo.jpg" alt="직UP 로고" /></button>
+      <button className="brand" onClick={() => setView("home")} aria-label="직UP 홈으로 이동"><img src="/logo.jpg" alt="직UP 로고" /><span className="brand-copy">직업공통능력</span></button>
       <div className="side-label">학습 메뉴</div>
       <nav>{[["areas", "◈", "인증영역"], ["history", "▤", "학습 기록"], ["wrong", "♡", "오답노트"]].map(([id, icon, label]) => <button key={id} className={view === id ? "nav-item active" : "nav-item"} onClick={() => setView(id)}><span>{icon}</span>{label}</button>)}</nav>
       <div className="side-bottom"><div className="tip-card"><span className="tip-icon">✦</span><div><strong>오늘의 목표</strong><p>하루 {dailyGoal}문제 목표</p><div className="mini-progress"><i style={{ width: `${Math.min(100, (sessionSolved / Math.max(1, dailyGoal)) * 100)}%` }} /></div></div></div><button className="profile" onClick={() => setSettingsOpen(true)}><span className="avatar">{displayName.slice(0, 1)}</span><span><b>{displayName}님</b><small>개인 설정</small></span><span className="dots">⋮</span></button></div>
