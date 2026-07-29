@@ -97,6 +97,7 @@ export default function Home() {
       <div className="side-bottom"><div className="tip-card"><span className="tip-icon">✦</span><div><strong>오늘의 목표</strong><p>하루 {dailyGoal}문제 목표</p><div className="mini-progress"><i style={{ width: `${Math.min(100, (sessionSolved / Math.max(1, dailyGoal)) * 100)}%` }} /></div></div></div><button className="profile" onClick={() => setSettingsOpen(true)}><span className="avatar">{displayName.slice(0, 1)}</span><span><b>{displayName}님</b><small>개인 설정</small></span><span className="dots">⋮</span></button></div>
     </aside>
     <section className="content">
+      {view === "practice" && areaId === "problem" && <div className="resource-strip"><span>문제해결능력 공식 강의</span><a href="https://www.ncs.go.kr/th03/TH0302List.do?dirSeq=123" target="_blank" rel="noreferrer">NCS 강의 목록 보기 ↗</a></div>}
       <header className="topbar"><div className="breadcrumb">직UP <span>/</span> {view === "home" ? "대시보드" : view === "practice" ? "문제 풀이" : view === "wrong" ? "오답노트" : "학습 기록"}</div><div className="top-actions"><span className="demo-badge">● 데모 모드</span><button className="icon-btn" onClick={() => setSettingsOpen(true)}>⚙</button></div></header>
       {view === "home" && <HomeView recentActivity={recentActivity} onChoose={() => setView("areas")} onAreaChoose={chooseArea} onHistory={() => setView("history")} />}
       {view === "areas" && <AreaView onChoose={chooseArea} />}

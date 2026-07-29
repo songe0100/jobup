@@ -7,3 +7,7 @@
 .similar-preview { margin-top: 16px; background: #fffaf7; border: 1px solid #f1e4dc; border-radius: 9px; padding: 12px; font-size: 11px; color: #6f6a63; }
 .similar-preview p { margin: 0 0 10px; line-height: 1.6; }
 .similar-preview span { display: block; margin-top: 5px; color: #4a4640; }
+.resource-strip { margin: 14px 52px 0; padding: 10px 14px; border: 1px solid #e9e1d8; border-radius: 9px; background: #fffaf5; display: flex; align-items: center; justify-content: space-between; gap: 12px; color: #756e65; font-size: 11px; }
+.resource-strip a { color: #c56652; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.resource-strip a:hover { text-decoration: underline; }
+@media(max-width:620px) { .resource-strip { margin: 10px 16px 0; font-size: 10px; } }
