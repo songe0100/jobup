@@ -5,6 +5,7 @@ import { pdfQuestions } from "./problemQuestions";
 
 type Area = { id: string; label: string; short: string; color: string; icon: string; desc: string; stat: string };
 type Question = { id: string; area: string; type: string; level: string; title: string; body: string; choices?: string[]; answer: string; explanation: string; process: string[]; concept: string };
+type RecentActivity = { areaId: string; label: string; type: string; level: string; score: string; count: number; timestamp: string };
 
 const areas: Area[] = [
   { id: "korean", label: "의사소통 국어", short: "국어", color: "coral", icon: "ㄱ", desc: "문서 이해와 표현", stat: "72%" },
@@ -53,6 +54,7 @@ export default function Home() {
   const [similarQuestion, setSimilarQuestion] = useState<Question | null>(null);
   const [attempts, setAttempts] = useState(12);
   const [sessionSolved, setSessionSolved] = useState(0);
+  const [recentActivity, setRecentActivity] = useState<RecentActivity | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [model, setModel] = useState("Gemini 3.5 Flash-Lite");
   const [key, setKey] = useState("");
@@ -62,11 +64,12 @@ export default function Home() {
   const correct = answer === question.answer;
 
   useEffect(() => { const raw = localStorage.getItem("job-cert-settings"); if (raw) { const s = JSON.parse(raw); setModel(s.model || model); setKey(s.key || ""); } }, []);
+  useEffect(() => { const raw = localStorage.getItem("job-cert-recent"); if (raw) setRecentActivity(JSON.parse(raw)); }, []);
   useEffect(() => { localStorage.setItem("job-cert-attempts", String(attempts)); }, [attempts]);
   const progress = useMemo(() => submitted ? 50 : 25, [submitted]);
 
   function chooseArea(id: string) { setAreaId(id); const match = allQuestions.find((q) => q.area === id) ?? fallbackQuestion; setQuestion(match); setAnswer(""); setSubmitted(false); setSaved(false); setView("practice"); }
-  function submit() { if (!answer) return; setSubmitted(true); setAttempts((v) => v + 1); setSessionSolved((v) => v + 1); }
+  function submit() { if (!answer) return; setSubmitted(true); setAttempts((v) => v + 1); setSessionSolved((v) => v + 1); const nextRecent = { areaId, label: area.label, type: question.type, level: question.level, score: correct ? "정답" : "오답", count: attempts + 1, timestamp: "방금 전" }; setRecentActivity(nextRecent); localStorage.setItem("job-cert-recent", JSON.stringify(nextRecent)); }
   function next() { const areaQuestions = allQuestions.filter((q) => q.area === areaId); const idx = areaQuestions.findIndex((q) => q.id === question.id); const nextQ = areaQuestions[(idx + 1) % areaQuestions.length] ?? fallbackQuestion; setQuestion(nextQ); setAreaId(nextQ.area); setAnswer(""); setSubmitted(false); setSaved(false); }
   function openSupplement() { setSimilarQuestion(createSimilarQuestion(question)); setView("supplement"); }
   function startSimilar() { if (!similarQuestion) return; setQuestion(similarQuestion); setAreaId(similarQuestion.area); setAnswer(""); setSubmitted(false); setSaved(false); setView("practice"); }
@@ -81,7 +84,7 @@ export default function Home() {
     </aside>
     <section className="content">
       <header className="topbar"><div className="breadcrumb">커리어스텝 <span>/</span> {view === "home" ? "대시보드" : view === "practice" ? "문제 풀이" : view === "wrong" ? "오답노트" : "학습 기록"}</div><div className="top-actions"><span className="demo-badge">● 데모 모드</span><button className="icon-btn" onClick={() => setSettingsOpen(true)}>⚙</button></div></header>
-      {view === "home" && <HomeView onChoose={() => setView("areas")} onHistory={() => setView("history")} />}
+      {view === "home" && <HomeView recentActivity={recentActivity} onChoose={() => setView("areas")} onHistory={() => setView("history")} />}
       {view === "areas" && <AreaView onChoose={chooseArea} />}
       {view === "practice" && <PracticeView area={area} question={question} questionNumber={questionNumber} questionTotal={areaQuestions.length} sessionSolved={sessionSolved} answer={answer} setAnswer={setAnswer} submitted={submitted} correct={correct} progress={progress} saved={saved} onSubmit={submit} onNext={next} onSave={() => setSaved(true)} onBack={() => setView("areas")} onStudy={openSupplement} />}
       {view === "supplement" && <SupplementView question={question} similarQuestion={similarQuestion} area={area} onStartSimilar={startSimilar} />}
@@ -92,7 +95,7 @@ export default function Home() {
   </main>;
 }
 
-function HomeView({ onChoose, onHistory }: { onChoose: () => void; onHistory: () => void }) { return <div className="page"><div className="hero"><div><p className="eyebrow">YOUR NEXT STEP</p><h1>오늘도 한 걸음,<br /><em>나의 가능성</em>을 넓혀요.</h1><p className="hero-copy">직업공통능력 인증시험, 커리어스텝과 함께<br />나에게 맞는 속도로 준비해 보세요.</p><button className="primary" onClick={onChoose}>학습 시작하기 <span>→</span></button></div><div className="hero-art"><div className="sun" /><div className="art-card"><span>✦</span><b>이번 주 학습</b><strong>6.5h</strong><small>지난주보다 +1.2h</small></div><div className="art-circle">C</div></div></div><div className="section-heading"><div><p className="eyebrow">EXPLORE</p><h2>인증영역을 선택하세요</h2></div><button className="text-btn" onClick={onChoose}>전체 보기 →</button></div><div className="area-grid">{areas.map((a) => <button className={`area-card ${a.color}`} key={a.id} onClick={onChoose}><span className="area-icon">{a.icon}</span><span><b>{a.label}</b><small>{a.id === "problem" ? a.desc : "개발 중"}</small></span><span className="area-arrow">↗</span></button>)}</div><div className="section-heading record-head"><div><p className="eyebrow">YOUR PROGRESS</p><h2>최근 학습 현황</h2></div><button className="text-btn" onClick={onHistory}>학습 기록 보기 →</button></div><div className="progress-card"><div className="progress-main"><span className="round-icon coral">ㄱ</span><div><b>의사소통 국어</b><p>문서이해 · 중급</p></div><strong>72<span>%</span></strong></div><div className="bar"><i style={{ width: "72%" }} /></div><div className="progress-foot"><span>최근 학습: 오늘 오전 10:24</span><span>12문제 풀이</span></div></div></div> }
+function HomeView({ recentActivity, onChoose, onHistory }: { recentActivity: RecentActivity | null; onChoose: () => void; onHistory: () => void }) { const recentArea = areas.find((a) => a.id === recentActivity?.areaId) ?? areas[0]; return <div className="page"><div className="hero"><div><p className="eyebrow">YOUR NEXT STEP</p><h1>오늘도 한 걸음,<br /><em>나의 가능성</em>을 넓혀요.</h1><p className="hero-copy">직업공통능력 인증시험, 커리어스텝과 함께<br />나에게 맞는 속도로 준비해 보세요.</p><button className="primary" onClick={onChoose}>학습 시작하기 <span>→</span></button></div><div className="hero-art"><div className="sun" /><div className="art-card"><span>✦</span><b>이번 주 학습</b><strong>6.5h</strong><small>지난주보다 +1.2h</small></div><div className="art-circle">C</div></div></div><div className="section-heading"><div><p className="eyebrow">EXPLORE</p><h2>인증영역을 선택하세요</h2></div><button className="text-btn" onClick={onChoose}>전체 보기 →</button></div><div className="area-grid">{areas.map((a) => <button className={`area-card ${a.color}`} key={a.id} onClick={onChoose}><span className="area-icon">{a.icon}</span><span><b>{a.label}</b><small>{a.id === "problem" ? a.desc : "개발 중"}</small></span><span className="area-arrow">↗</span></button>)}</div><div className="section-heading record-head"><div><p className="eyebrow">YOUR PROGRESS</p><h2>최근 학습 현황</h2></div><button className="text-btn" onClick={onHistory}>학습 기록 보기 →</button></div>{recentActivity ? <div className="progress-card"><div className="progress-main"><span className={`round-icon ${recentArea.color}`}>{recentArea.icon}</span><div><b>{recentActivity.label}</b><p>{recentActivity.type} · {recentActivity.level}</p></div><strong>{recentActivity.score}<span> · {recentActivity.count}회</span></strong></div><div className="bar"><i style={{ width: recentActivity.score === "정답" ? "100%" : "42%" }} /></div><div className="progress-foot"><span>최근 학습: {recentActivity.timestamp}</span><span>{recentActivity.score === "정답" ? "정답으로 완료" : "보충학습을 추천했어요"}</span></div></div> : <div className="progress-card empty-progress"><div><b>아직 최근 학습 기록이 없어요.</b><p>문제해결 영역에서 첫 문제를 풀면 여기에 표시됩니다.</p></div><button className="secondary" onClick={onChoose}>첫 문제 풀기 →</button></div>}</div> }
 
 function AreaView({ onChoose }: { onChoose: (id: string) => void }) { return <div className="page"><div className="page-title"><p className="eyebrow">CERTIFICATION AREAS</p><h1>어떤 영역을 공부할까요?</h1><p>현재 나의 학습 목표에 맞는 영역을 선택해 보세요.</p></div><div className="area-grid big">{areas.map((a) => <button className={`area-card ${a.color}`} key={a.id} onClick={() => onChoose(a.id)}><span className="area-icon">{a.icon}</span><span><b>{a.label}</b><small>{a.desc}</small><small className="area-stat">현재 정답률 {a.stat}</small></span><span className="area-arrow">→</span></button>)}</div><div className="setup-panel"><div><p className="eyebrow">QUICK SETUP</p><h3>문제 설정은 풀이 화면에서 바로 바꿀 수 있어요.</h3></div><span>문제 유형 · 난이도 · 문제 형식</span></div></div> }
 
