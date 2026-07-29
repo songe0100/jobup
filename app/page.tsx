@@ -58,12 +58,14 @@ export default function Home() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [model, setModel] = useState("Gemini 3.5 Flash-Lite");
   const [key, setKey] = useState("");
+  const [displayName, setDisplayName] = useState("서준");
+  const [dailyGoal, setDailyGoal] = useState(3);
   const area = areas.find((item) => item.id === areaId) ?? areas[0];
   const areaQuestions = allQuestions.filter((q) => q.area === areaId);
   const questionNumber = Math.max(1, areaQuestions.findIndex((q) => q.id === question.id) + 1);
   const correct = answer === question.answer;
 
-  useEffect(() => { const raw = localStorage.getItem("job-cert-settings"); if (raw) { const s = JSON.parse(raw); setModel(s.model || model); setKey(s.key || ""); } }, []);
+  useEffect(() => { const raw = localStorage.getItem("job-cert-settings"); if (raw) { const s = JSON.parse(raw); setModel(s.model || model); setKey(s.key || ""); setDisplayName(s.displayName || "서준"); setDailyGoal(Number(s.dailyGoal) || 3); } }, []);
   useEffect(() => { const raw = localStorage.getItem("job-cert-recent"); if (raw) setRecentActivity(JSON.parse(raw)); }, []);
   useEffect(() => { localStorage.setItem("job-cert-attempts", String(attempts)); }, [attempts]);
   const progress = useMemo(() => submitted ? 50 : 25, [submitted]);
@@ -73,14 +75,14 @@ export default function Home() {
   function next() { const areaQuestions = allQuestions.filter((q) => q.area === areaId); const idx = areaQuestions.findIndex((q) => q.id === question.id); const nextQ = areaQuestions[(idx + 1) % areaQuestions.length] ?? fallbackQuestion; setQuestion(nextQ); setAreaId(nextQ.area); setAnswer(""); setSubmitted(false); setSaved(false); }
   function openSupplement() { setSimilarQuestion(createSimilarQuestion(question)); setView("supplement"); }
   function startSimilar() { if (!similarQuestion) return; setQuestion(similarQuestion); setAreaId(similarQuestion.area); setAnswer(""); setSubmitted(false); setSaved(false); setView("practice"); }
-  function saveSettings() { localStorage.setItem("job-cert-settings", JSON.stringify({ model, key })); setSettingsOpen(false); }
+  function saveSettings() { localStorage.setItem("job-cert-settings", JSON.stringify({ model, key, displayName, dailyGoal })); setSettingsOpen(false); }
 
   return <main className="app-shell">
     <aside className="sidebar">
       <div className="brand"><span className="brand-mark">C</span><span>커리어<span className="brand-accent">스텝</span></span></div>
       <div className="side-label">학습 메뉴</div>
       <nav>{[["home", "⌂", "대시보드"], ["areas", "◈", "인증영역"], ["history", "▤", "학습 기록"], ["wrong", "♡", "오답노트"]].map(([id, icon, label]) => <button key={id} className={view === id ? "nav-item active" : "nav-item"} onClick={() => setView(id)}><span>{icon}</span>{label}</button>)}</nav>
-      <div className="side-bottom"><div className="tip-card"><span className="tip-icon">✦</span><div><strong>오늘의 목표</strong><p>하루 3문제 목표</p><div className="mini-progress"><i style={{ width: "66%" }} /></div></div></div><button className="profile" onClick={() => setSettingsOpen(true)}><span className="avatar">서</span><span><b>서준님</b><small>개인 설정</small></span><span className="dots">⋮</span></button></div>
+      <div className="side-bottom"><div className="tip-card"><span className="tip-icon">✦</span><div><strong>오늘의 목표</strong><p>하루 {dailyGoal}문제 목표</p><div className="mini-progress"><i style={{ width: `${Math.min(100, (sessionSolved / Math.max(1, dailyGoal)) * 100)}%` }} /></div></div></div><button className="profile" onClick={() => setSettingsOpen(true)}><span className="avatar">{displayName.slice(0, 1)}</span><span><b>{displayName}님</b><small>개인 설정</small></span><span className="dots">⋮</span></button></div>
     </aside>
     <section className="content">
       <header className="topbar"><div className="breadcrumb">커리어스텝 <span>/</span> {view === "home" ? "대시보드" : view === "practice" ? "문제 풀이" : view === "wrong" ? "오답노트" : "학습 기록"}</div><div className="top-actions"><span className="demo-badge">● 데모 모드</span><button className="icon-btn" onClick={() => setSettingsOpen(true)}>⚙</button></div></header>
@@ -91,7 +93,7 @@ export default function Home() {
       {view === "history" && <HistoryView onRetry={chooseArea} />}
       {view === "wrong" && <WrongView onRetry={chooseArea} />}
     </section>
-    {settingsOpen && <div className="modal-backdrop" onClick={() => setSettingsOpen(false)}><div className="modal" onClick={(e) => e.stopPropagation()}><div className="modal-head"><div><p className="eyebrow">PERSONAL SETTINGS</p><h2>개인 설정</h2></div><button className="close" onClick={() => setSettingsOpen(false)}>×</button></div><label>Gemini API 키<span className="muted">서버에서만 사용되도록 암호화해 관리합니다.</span><input type="password" placeholder="AIza..." value={key} onChange={(e) => setKey(e.target.value)} /></label><label>선호 모델<select value={model} onChange={(e) => setModel(e.target.value)}><option>Gemini 3.5 Flash-Lite</option><option>Gemini 3.5 Flash</option><option>Gemini 3.5 Pro</option></select></label><label>기본 학습 영역<select><option>의사소통 국어</option><option>수리활용 영역</option><option>문제해결 영역</option></select></label><button className="primary full" onClick={saveSettings}>설정 저장하기</button></div></div>}
+    {settingsOpen && <div className="modal-backdrop" onClick={() => setSettingsOpen(false)}><div className="modal" onClick={(e) => e.stopPropagation()}><div className="modal-head"><div><p className="eyebrow">PERSONAL SETTINGS</p><h2>개인 설정</h2></div><button className="close" onClick={() => setSettingsOpen(false)}>×</button></div><label>표시 이름<span className="muted">사이드바에 표시할 이름입니다.</span><input type="text" placeholder="이름을 입력하세요" value={displayName} onChange={(e) => setDisplayName(e.target.value)} /></label><label>오늘의 목표 문항 수<input type="number" min="1" max="50" value={dailyGoal} onChange={(e) => setDailyGoal(Math.max(1, Number(e.target.value) || 1))} /></label><label>Gemini API 키<span className="muted">서버에서만 사용되도록 암호화해 관리합니다.</span><input type="password" placeholder="AIza..." value={key} onChange={(e) => setKey(e.target.value)} /></label><label>선호 모델<select value={model} onChange={(e) => setModel(e.target.value)}><option>Gemini 3.5 Flash-Lite</option><option>Gemini 3.5 Flash</option><option>Gemini 3.5 Pro</option></select></label><label>기본 학습 영역<select><option>의사소통 국어</option><option>수리활용 영역</option><option>문제해결 영역</option></select></label><button className="primary full" onClick={saveSettings}>설정 저장하기</button></div></div>}
   </main>;
 }
 
