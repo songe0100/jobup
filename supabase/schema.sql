@@ -1,0 +1,16 @@
+-- Supabase SQL Editor에서 실행하세요. 모든 사용자 데이터는 RLS로 분리됩니다.
+create extension if not exists "pgcrypto";
+create table if not exists profiles (id uuid primary key references auth.users(id) on delete cascade, display_name text default '학습자', preferred_model text default 'gemini-3.5-flash-lite', default_area text default 'korean', created_at timestamptz default now());
+create table if not exists questions (id uuid primary key default gen_random_uuid(), area text not null, question_type text not null, difficulty text not null, content jsonb not null, answer text not null, explanation text, created_at timestamptz default now());
+create table if not exists attempts (id uuid primary key default gen_random_uuid(), user_id uuid references auth.users(id) on delete cascade not null, question_id uuid references questions(id), area text not null, question_type text, difficulty text, question_content jsonb, submitted_answer text, correct_answer text, is_correct boolean, duration_seconds int default 0, weak_concept text, submitted_at timestamptz default now());
+create table if not exists weak_concepts (id uuid primary key default gen_random_uuid(), user_id uuid references auth.users(id) on delete cascade not null, area text not null, concept text not null, weakness_score numeric default 0, analysis jsonb, updated_at timestamptz default now());
+create table if not exists supplemental_contents (id uuid primary key default gen_random_uuid(), user_id uuid references auth.users(id) on delete cascade not null, area text not null, concept text, content jsonb not null, created_at timestamptz default now());
+create table if not exists wrong_answers (id uuid primary key default gen_random_uuid(), user_id uuid references auth.users(id) on delete cascade not null, question_id uuid references questions(id), attempt_id uuid references attempts(id), created_at timestamptz default now(), unique(user_id, question_id));
+create table if not exists study_sessions (id uuid primary key default gen_random_uuid(), user_id uuid references auth.users(id) on delete cascade not null, area text not null, total_questions int default 0, correct_questions int default 0, total_duration_seconds int default 0, started_at timestamptz default now(), ended_at timestamptz);
+alter table profiles enable row level security; alter table attempts enable row level security; alter table weak_concepts enable row level security; alter table supplemental_contents enable row level security; alter table wrong_answers enable row level security; alter table study_sessions enable row level security;
+create policy "own profile" on profiles for all using (auth.uid() = id) with check (auth.uid() = id);
+create policy "own attempts" on attempts for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "own concepts" on weak_concepts for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "own supplements" on supplemental_contents for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "own wrong answers" on wrong_answers for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "own sessions" on study_sessions for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
