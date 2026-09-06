@@ -53,10 +53,24 @@ export function persistLearningState(state: LearningState) {
   if (typeof window !== "undefined") window.localStorage.setItem(STATE_KEY, JSON.stringify({ ...state, updatedAt: new Date().toISOString() }));
 }
 
+export function syncLearningState(state: LearningState) {
+  if (typeof window === "undefined" || !state.attempts.length) return;
+  void fetch("/api/learning/sync", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(state) }).catch(() => undefined);
+}
+
 export function appendAttempt(state: LearningState, attempt: LearningAttempt): LearningState {
   const next = { ...state, attempts: [attempt, ...state.attempts].slice(0, 500), lastAreaId: attempt.areaId };
   rebuildWeakConcepts(next);
   persistLearningState(next);
+  syncLearningState(next);
+  return next;
+}
+
+export function updateAttempt(state: LearningState, attemptId: string, patch: Partial<LearningAttempt>): LearningState {
+  const next = { ...state, attempts: state.attempts.map((attempt) => attempt.id === attemptId ? { ...attempt, ...patch } : attempt) };
+  rebuildWeakConcepts(next);
+  persistLearningState(next);
+  syncLearningState(next);
   return next;
 }
 
