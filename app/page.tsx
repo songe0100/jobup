@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { pdfQuestions } from "./problemQuestions";
 import WrongViewDynamic from "./WrongView";
+import { appendAttempt, createEmptyLearningState, loadLearningState, persistLearningState } from "./lib/learning-store";
+import type { LearningState } from "./lib/learning-types";
 
 type Area = { id: string; label: string; short: string; color: string; icon: string; desc: string; stat: string };
 type Question = { id: string; area: string; type: string; level: string; title: string; body: string; choices?: string[]; answer: string; explanation: string; process: string[]; concept: string };
@@ -60,6 +62,7 @@ export default function Home() {
   const [recentActivity, setRecentActivity] = useState<RecentActivity | null>(null);
   const [historyRecords, setHistoryRecords] = useState<HistoryRecord[]>([]);
   const [savedQuestionIds, setSavedQuestionIds] = useState<string[]>([]);
+  const [learningState, setLearningState] = useState<LearningState>(() => createEmptyLearningState());
   const [startedAt, setStartedAt] = useState(Date.now());
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -76,7 +79,7 @@ export default function Home() {
 
   useEffect(() => { const raw = localStorage.getItem("job-cert-settings"); if (raw) { const s = JSON.parse(raw); setModel(s.model || model); setKey(s.key || ""); setDisplayName(s.displayName || "서준"); setDailyGoal(Number(s.dailyGoal) || 3); } }, []);
   useEffect(() => { const raw = localStorage.getItem("job-cert-recent"); if (raw) setRecentActivity(JSON.parse(raw)); }, []);
-  useEffect(() => { const raw = localStorage.getItem("job-cert-history"); if (raw) setHistoryRecords(JSON.parse(raw)); }, []);
+  useEffect(() => { const state = loadLearningState(); setLearningState(state); const raw = localStorage.getItem("job-cert-history"); if (raw) setHistoryRecords(JSON.parse(raw)); }, []);
   useEffect(() => { const raw = localStorage.getItem("job-cert-wrong-answers"); if (raw) setSavedQuestionIds(JSON.parse(raw)); }, []);
   useEffect(() => { if (view !== "practice" || submitted) return; const timer = window.setInterval(() => setElapsedSeconds(Math.floor((Date.now() - startedAt) / 1000)), 1000); return () => window.clearInterval(timer); }, [view, submitted, startedAt]);
   useEffect(() => { localStorage.setItem("job-cert-attempts", String(attempts)); }, [attempts]);
@@ -84,11 +87,11 @@ export default function Home() {
 
   function chooseArea(id: string) { const areaQuestions = allQuestions.filter((q) => q.area === id); const match = areaQuestions[Math.floor(Math.random() * areaQuestions.length)] ?? fallbackQuestion; setAreaId(id); setQuestion(match); setAnswer(""); setSubmitted(false); setSaved(false); setStartedAt(Date.now()); setElapsedSeconds(0); setView("practice"); }
   function retryQuestion(id: string) { const match = allQuestions.find((q) => q.id === id); if (!match) return; setAreaId(match.area); setQuestion(match); setAnswer(""); setSubmitted(false); setSaved(savedQuestionIds.includes(match.id)); setStartedAt(Date.now()); setElapsedSeconds(0); setView("practice"); }
-  function submit() { if (!answer || submitted) return; setSubmitted(true); setAttempts((v) => v + 1); setSessionSolved((v) => v + 1); const now = new Date(); const duration = Math.max(1, Math.floor((Date.now() - startedAt) / 1000)); const record: HistoryRecord = { id: `${question.id}-${now.getTime()}`, areaId, label: area.label, title: question.title, type: question.type, level: question.level, correct, duration, timestamp: "방금 전", dateKey: now.toISOString().slice(0, 10) }; const nextRecords = [record, ...historyRecords].slice(0, 100); setHistoryRecords(nextRecords); localStorage.setItem("job-cert-history", JSON.stringify(nextRecords)); const nextRecent = { areaId, label: area.label, type: question.type, level: question.level, score: correct ? "정답" : "오답", count: attempts + 1, timestamp: "방금 전" }; setRecentActivity(nextRecent); localStorage.setItem("job-cert-recent", JSON.stringify(nextRecent)); }
+  function submit() { if (!answer || submitted) return; setSubmitted(true); setAttempts((v) => v + 1); setSessionSolved((v) => v + 1); const now = new Date(); const duration = Math.max(1, Math.floor((Date.now() - startedAt) / 1000)); const record: HistoryRecord = { id: `${question.id}-${now.getTime()}`, areaId, label: area.label, title: question.title, type: question.type, level: question.level, correct, duration, timestamp: "방금 전", dateKey: now.toISOString().slice(0, 10) }; const nextRecords = [record, ...historyRecords].slice(0, 100); setHistoryRecords(nextRecords); localStorage.setItem("job-cert-history", JSON.stringify(nextRecords)); const nextAttempt = { id: record.id, userId: "local-demo-user", questionId: question.id, areaId, attemptKind: "practice" as const, questionTitle: question.title, questionType: question.type, difficulty: question.level, concept: question.concept, submittedAnswer: answer, correctAnswer: question.answer, isCorrect: correct, durationSeconds: duration, feedbackStage: "revealed" as const, hintCount: 0, retryCount: 0, submittedAt: now.toISOString() }; const nextLearningState = appendAttempt(learningState, nextAttempt); setLearningState(nextLearningState); const nextRecent = { areaId, label: area.label, type: question.type, level: question.level, score: correct ? "정답" : "오답", count: attempts + 1, timestamp: "방금 전" }; setRecentActivity(nextRecent); localStorage.setItem("job-cert-recent", JSON.stringify(nextRecent)); }
   function next() { const areaQuestions = allQuestions.filter((q) => q.area === areaId); const candidates = areaQuestions.filter((q) => q.id !== question.id); const nextQ = candidates[Math.floor(Math.random() * candidates.length)] ?? areaQuestions[0] ?? fallbackQuestion; setQuestion(nextQ); setAreaId(nextQ.area); setAnswer(""); setSubmitted(false); setSaved(false); setStartedAt(Date.now()); setElapsedSeconds(0); }
   function openSupplement() { const profile = getSupplementProfile(historyRecords, areaId); setSimilarQuestion({ ...createSimilarQuestion(question), level: profile.level }); setView("supplement"); }
   function startSimilar() { if (!similarQuestion) return; setQuestion(similarQuestion); setAreaId(similarQuestion.area); setAnswer(""); setSubmitted(false); setSaved(false); setStartedAt(Date.now()); setElapsedSeconds(0); setView("practice"); }
-  function saveCurrentQuestion() { if (correct) return; setSavedQuestionIds((previous) => { const next = previous.includes(question.id) ? previous : [question.id, ...previous]; localStorage.setItem("job-cert-wrong-answers", JSON.stringify(next)); return next; }); setSaved(true); }
+  function saveCurrentQuestion() { if (correct) return; setSavedQuestionIds((previous) => { const next = previous.includes(question.id) ? previous : [question.id, ...previous]; localStorage.setItem("job-cert-wrong-answers", JSON.stringify(next)); const nextState = { ...learningState, wrongQuestionIds: next }; persistLearningState(nextState); setLearningState(nextState); return next; }); setSaved(true); }
   function saveSettings() { localStorage.setItem("job-cert-settings", JSON.stringify({ model, key, displayName, dailyGoal })); setSettingsOpen(false); }
 
   return <main className="app-shell">
