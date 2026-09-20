@@ -7,4 +7,6 @@
   .hero { display: flex; flex-direction: column; min-height: auto; gap: 18px; }
   .hero > div:first-child { position: relative; z-index: 2; }
   .hero-art { position: relative !important; top: auto !important; right: auto !important; width: 100% !important; height: 205px; transform: scale(.78) !important; transform-origin: center top !important; opacity: .75; }
+  .feedback-copy ol { list-style: none; padding-left: 0 !important; margin-left: 0 !important; }
+  .feedback-copy ol li { padding-left: 0 !important; margin-left: 0 !important; }
 }
