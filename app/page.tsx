@@ -14,12 +14,12 @@ type HistoryRecord = { id: string; areaId: string; label: string; title: string;
 type DiagnosisResult = { question: string; correct: boolean; duration: number };
 
 const areas: Area[] = [
+  { id: "problem", label: "문제해결 영역", short: "문제해결", color: "purple", icon: "⌁", desc: "평가 대상 · 문제해결능력 · 디지털능력", stat: "평가 대상" },
   { id: "korean", label: "의사소통 국어", short: "국어", color: "coral", icon: "ㄱ", desc: "문서 이해와 표현", stat: "72%" },
   { id: "english", label: "의사소통 영어", short: "영어", color: "blue", icon: "A", desc: "업무 영어와 독해", stat: "64%" },
   { id: "math", label: "수리활용 영역", short: "수리", color: "mint", icon: "∑", desc: "자료 해석과 계산", stat: "81%" },
-  { id: "problem", label: "문제해결 영역", short: "문제해결", color: "purple", icon: "⌁", desc: "문제해결능력 · 디지털능력", stat: "58%" },
   { id: "adapt", label: "직무적응 영역", short: "직무적응", color: "yellow", icon: "✦", desc: "조직과 업무 적응", stat: "76%" },
-];
+]; 
 
 const questions: Question[] = [
   { id: "q1", area: "korean", type: "문서이해", level: "중급", title: "핵심 내용을 찾아보세요", body: "다음 공지문의 내용으로 가장 적절한 것은 무엇입니까?\n\n‘하반기부터 모든 팀은 회의 전 안건을 공유하고, 회의 후 24시간 이내에 결정사항을 기록한다. 이를 통해 회의의 효율성과 실행력을 높이고자 한다.’", choices: ["회의 시간을 줄이는 것이 가장 큰 목적이다.", "회의 전후의 기록을 표준화하는 것이 핵심이다.", "하반기부터 회의 자체를 없애려 한다.", "안건 공유는 회의 후에 진행한다."], answer: "회의 전후의 기록을 표준화하는 것이 핵심이다.", explanation: "공지문은 회의 전 안건 공유와 회의 후 결정사항 기록을 함께 요구합니다. 따라서 전후 기록을 표준화한다는 선택지가 핵심을 정확히 요약합니다.", process: ["실행 지침을 시간 순서로 나눕니다.", "‘전’과 ‘후’에 해당하는 행동을 찾습니다.", "두 행동을 묶는 목적을 선택합니다."], concept: "핵심 내용 요약" },
