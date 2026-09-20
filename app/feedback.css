@@ -1,2 +1,3 @@
 .hint-box b { font-size: 12px; }
 .hint-box p { font-size: 13px; line-height: 1.7; }
+.session-card p { display: none; }
