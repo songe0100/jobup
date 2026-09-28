@@ -27,6 +27,9 @@
 .nav-item span { font-size: 19px; }
 .stats-row span, .stats-row small { font-size: 13px; }
 .stats-row small { line-height: 1.5; }
+.choice { font-size: 15px; }
+.choice > span { font-size: 12px; }
+.feedback-actions .secondary { padding: 8px 13px; font-size: 13px; }
 .diagnosis-level-card { margin-top: 22px; }
 .diagnosis-level-card h2 { margin-bottom: 8px; }
 .weak-area-list { margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(39, 38, 34, .12); }
@@ -68,5 +71,6 @@
   .diagnosis-answer { grid-template-columns: 1fr; gap: 4px; }
   .diagnosis-answer b { margin-top: 7px; }
   .diagnosis-result-item { padding: 16px; }
+  .choice { font-size: 14px; }
   .lesson-card.reevaluation-summary > p { font-size: 16px; line-height: 1.7; }
 }
