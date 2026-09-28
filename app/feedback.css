@@ -35,6 +35,7 @@
 .wrong-item b { font-size: 16px; }
 .wrong-item small { font-size: 13px; }
 .wrong-item .secondary { font-size: 13px; padding: 10px 14px; }
+.wrong-item { padding-left: 0; }
 .diagnosis-level-card { margin-top: 22px; }
 .diagnosis-level-card h2 { margin-bottom: 8px; }
 .weak-area-list { margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(39, 38, 34, .12); }
