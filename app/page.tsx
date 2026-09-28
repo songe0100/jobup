@@ -92,6 +92,7 @@ export default function Home() {
   useEffect(() => { const state = loadLearningState(); setLearningState(state); const raw = localStorage.getItem("job-cert-history"); if (raw) setHistoryRecords(JSON.parse(raw)); }, []);
   useEffect(() => { const raw = localStorage.getItem("job-cert-wrong-answers"); if (raw) setSavedQuestionIds(JSON.parse(raw)); }, []);
   useEffect(() => { if (view !== "practice" || submitted) return; const timer = window.setInterval(() => setElapsedSeconds(Math.floor((Date.now() - startedAt) / 1000)), 1000); return () => window.clearInterval(timer); }, [view, submitted, startedAt]);
+  useEffect(() => { if (!diagnosisMode || !submitted) return; const advance = window.setTimeout(() => next(), 350); return () => window.clearTimeout(advance); }, [diagnosisMode, submitted]);
   useEffect(() => { localStorage.setItem("job-cert-attempts", String(attempts)); }, [attempts]);
   const progress = useMemo(() => submitted ? 50 : 25, [submitted]);
 
