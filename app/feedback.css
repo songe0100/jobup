@@ -15,9 +15,11 @@
 .area-card b { font-size: 14px; }
 .area-card small { font-size: 12px; }
 .area-card small { font-size: 14px; line-height: 1.45; }
-.progress-main b { font-size: 14px; }
-.progress-main p { font-size: 11px; }
-.progress-foot { font-size: 11px; }
+.progress-main b { font-size: 17px; }
+.progress-main p { font-size: 14px; }
+.progress-main strong span { font-size: 14px; }
+.progress-foot { font-size: 13px; }
+.record-head .text-btn { font-size: 13px; }
 .feedback-copy { font-size: 14px; line-height: 1.8; }
 .feedback-copy b { font-size: 13px; }
 .feedback-copy p, .feedback-copy li { font-size: 14px; line-height: 1.8; }
@@ -73,6 +75,9 @@
   .hero-copy { font-size: 14px; }
   .area-card b { font-size: 13px; }
   .area-card small { font-size: 13px; }
+  .progress-main b { font-size: 16px; }
+  .progress-main p { font-size: 13px; }
+  .progress-foot { font-size: 12px; }
   .feedback-copy { font-size: 14px; }
   .feedback-copy b { font-size: 13px; }
   .feedback-copy p, .feedback-copy li { font-size: 14px; }
