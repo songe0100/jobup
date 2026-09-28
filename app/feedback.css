@@ -14,6 +14,7 @@
 .hero-copy { font-size: 15px; }
 .area-card b { font-size: 14px; }
 .area-card small { font-size: 12px; }
+.area-card small { font-size: 14px; line-height: 1.45; }
 .progress-main b { font-size: 14px; }
 .progress-main p { font-size: 11px; }
 .progress-foot { font-size: 11px; }
@@ -71,7 +72,7 @@
   .resource-strip a { text-align: center; }
   .hero-copy { font-size: 14px; }
   .area-card b { font-size: 13px; }
-  .area-card small { font-size: 11px; }
+  .area-card small { font-size: 13px; }
   .feedback-copy { font-size: 14px; }
   .feedback-copy b { font-size: 13px; }
   .feedback-copy p, .feedback-copy li { font-size: 14px; }
