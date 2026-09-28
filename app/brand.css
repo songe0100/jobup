@@ -1,7 +1,7 @@
 .brand { border: 0; background: transparent; cursor: pointer; text-align: left; }
-.brand { width: 100%; gap: 10px; padding-left: 2px; padding-right: 2px; }
+.brand { width: 100%; gap: 3px; padding-left: 2px; padding-right: 2px; align-items: center; }
 .brand img { display: block; flex: 0 0 92px; width: 92px; height: 62px; object-fit: cover; object-position: center; border-radius: 4px; }
-.brand-copy { color: #F47F6B; font-size: 13px; font-weight: 800; letter-spacing: -0.9px; line-height: 1.25; white-space: nowrap; }
+.brand-copy { color: #F47F6B; font-size: 13px; font-weight: 800; letter-spacing: -0.9px; line-height: 1.25; white-space: nowrap; transform: translateY(1px); }
 .area-card.coming-soon { cursor: default; }
 .area-card.coming-soon:hover { transform: none; box-shadow: none; }
 .similar-preview { margin-top: 16px; background: #fffaf7; border: 1px solid #f1e4dc; border-radius: 9px; padding: 12px; font-size: 11px; color: #6f6a63; }
