@@ -8,6 +8,9 @@
 .hero-actions > button { min-height: 42px; }
 .hero-actions .secondary { border: 0; background: var(--coral); color: #fff; font-weight: 700; padding: 13px 18px; }
 .hero-actions .secondary:hover { background: #d96857; color: #fff; transform: translateY(-1px); }
+.resource-strip { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin: 14px 52px 0; padding: 13px 16px; border: 1px solid #f0c7bc; border-radius: 10px; background: #fff1ec; color: #9f4d40; font-size: 14px; font-weight: 800; }
+.resource-strip a { flex-shrink: 0; padding: 9px 13px; border-radius: 8px; background: var(--coral); color: #fff; font-size: 12px; font-weight: 800; text-decoration: none; }
+.resource-strip a:hover { background: #d96857; }
 .hero-copy { font-size: 15px; }
 .area-card b { font-size: 14px; }
 .area-card small { font-size: 12px; }
@@ -25,6 +28,8 @@
   .hero-art { position: relative !important; top: auto !important; right: auto !important; width: 100% !important; height: 205px; transform: scale(.78) !important; transform-origin: center top !important; opacity: .75; }
   .hero-actions { flex-direction: column; align-items: stretch; }
   .hero-actions button { width: 100%; }
+  .resource-strip { flex-direction: column; align-items: stretch; margin: 10px 16px 0; padding: 13px; font-size: 13px; }
+  .resource-strip a { text-align: center; }
   .hero-copy { font-size: 14px; }
   .area-card b { font-size: 13px; }
   .area-card small { font-size: 11px; }
