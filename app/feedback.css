@@ -21,6 +21,11 @@
 .feedback-copy b { font-size: 13px; }
 .feedback-copy p, .feedback-copy li { font-size: 14px; line-height: 1.8; }
 .hint-box p { font-size: 14px; }
+.side-label { font-size: 12px; }
+.nav-item { padding: 14px 13px; font-size: 16px; }
+.nav-item span { font-size: 19px; }
+.stats-row span, .stats-row small { font-size: 13px; }
+.stats-row small { line-height: 1.5; }
 .diagnosis-level-card { margin-top: 22px; }
 .diagnosis-level-card h2 { margin-bottom: 8px; }
 .weak-area-list { margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(39, 38, 34, .12); }
@@ -47,6 +52,8 @@
   .hero-actions { flex-direction: column; align-items: stretch; }
   .hero-actions button { width: 100%; }
   .resource-strip { flex-direction: column; align-items: stretch; margin: 8px 16px 0; padding: 8px 10px; font-size: 13px; }
+  .nav-item { padding: 11px 4px; font-size: 12px; }
+  .nav-item span { font-size: 16px; }
   .resource-strip a { text-align: center; }
   .hero-copy { font-size: 14px; }
   .area-card b { font-size: 13px; }
