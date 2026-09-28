@@ -30,6 +30,11 @@
 .choice { font-size: 15px; }
 .choice > span { font-size: 12px; }
 .feedback-actions .secondary { padding: 8px 13px; font-size: 13px; }
+.wrong-banner { font-size: 15px; }
+.wrong-item .tag { font-size: 12px; }
+.wrong-item b { font-size: 16px; }
+.wrong-item small { font-size: 13px; }
+.wrong-item .secondary { font-size: 13px; padding: 10px 14px; }
 .diagnosis-level-card { margin-top: 22px; }
 .diagnosis-level-card h2 { margin-bottom: 8px; }
 .weak-area-list { margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(39, 38, 34, .12); }
@@ -73,4 +78,7 @@
   .diagnosis-result-item { padding: 16px; }
   .choice { font-size: 14px; }
   .lesson-card.reevaluation-summary > p { font-size: 16px; line-height: 1.7; }
+  .wrong-banner { font-size: 14px; }
+  .wrong-item b { font-size: 15px; }
+  .wrong-item small { font-size: 12px; }
 }
