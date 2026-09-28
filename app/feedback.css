@@ -9,7 +9,7 @@
 .hero-actions .secondary { border: 0; background: var(--coral); color: #fff; font-weight: 700; padding: 13px 18px; }
 .hero-actions .secondary:hover { background: #d96857; color: #fff; transform: translateY(-1px); }
 .resource-strip { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin: 14px 52px 0; padding: 13px 16px; border: 1px solid #f0c7bc; border-radius: 10px; background: #fff1ec; color: #9f4d40; font-size: 14px; font-weight: 800; }
-.resource-strip a { flex-shrink: 0; padding: 9px 13px; border-radius: 8px; background: var(--coral); color: #fff; font-size: 12px; font-weight: 800; text-decoration: none; }
+.resource-strip a { flex-shrink: 0; padding: 9px 13px; border-radius: 8px; background: #f47f6b; color: #fff; font-size: 12px; font-weight: 800; text-decoration: none; }
 .resource-strip a:hover { background: #d96857; }
 .hero-copy { font-size: 15px; }
 .area-card b { font-size: 14px; }
