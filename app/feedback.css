@@ -33,6 +33,7 @@
 .choice { font-size: 15px; }
 .choice > span { font-size: 12px; }
 .question-meta span:nth-child(2) { display: none; }
+.question-panel h1 { display: none; }
 .feedback-actions .secondary { padding: 8px 13px; font-size: 13px; }
 .wrong-banner { font-size: 15px; }
 .wrong-item .tag { font-size: 12px; }
